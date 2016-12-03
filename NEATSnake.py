@@ -5,10 +5,11 @@ from neat import nn, population, statistics
 import os
 import curses
 
+
 def eval_fitness(genomes):
     for g in genomes:
         net = nn.create_feed_forward_phenotype(g)
-        score, turns = play_game(net)
+        score,turns = play_game(net)
         #print ("Score, turns", score, turns)
         g.fitness = score + turns*10
 
@@ -33,7 +34,12 @@ def play_game(net):
 
         inputs = [food_dist, dist_to_body(snake, 1, 0), dist_to_body(snake, -1, 0), 
                   dist_to_body(snake, 0, 1), dist_to_body(snake, 0, -1)]
-        direction = int(net.serial_activate(inputs)[0] * 4.0) 
+
+        direction = int(net.serial_activate(inputs)[0] * 4.0)
+        print("direction",direction)
+    
+
+
         snake.insert(0, [snake[0][0] + (direction == 0 and 1) + (direction == 1 and -1), snake[0][1] \
                         + (direction == 2 and -1) + (direction >= 3 and 1)])
 
@@ -84,7 +90,7 @@ def dist_to_food(snake, food):
 local_dir = os.path.dirname(__file__)
 config_path = os.path.join(local_dir, 'snake_config')
 pop = population.Population(config_path)
-pop.run(eval_fitness, 3000)
+pop.run(eval_fitness, 10)
 
 # Log statistics.
 statistics.save_stats(pop.statistics)
