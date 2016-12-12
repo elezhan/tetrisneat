@@ -1,4 +1,3 @@
-from __future__ import print_function
 from math import sqrt
 from random import randint
 from neat import nn, population, statistics
@@ -7,12 +6,16 @@ import curses
 import kivytetris
 import numpy as np
 
+max_score = 0
+
+
 def eval_fitness(genomes):
     for g in genomes:
         net = nn.create_feed_forward_phenotype(g)
         score = play_game(net)
-        #print ("Score, turns", score, turns)
         g.fitness = score 
+
+
 
 def play_game(net):
     """
@@ -23,29 +26,34 @@ def play_game(net):
     Returns:
         int: Score earned
     """
-
+    global max_score
     game = kivytetris.GameHandler()
 
+    num_rights = 0
     keep_playing = True
     score = 0
     while keep_playing:
         inputs = game.get_neural_net_inputs()
-
-        #output = int(net.serial_activate(inputs)[0] * 4.0)
+        # print [method for method in dir(net) if callable(getattr(net, method))]
         output = np.argmax(np.array(net.serial_activate(inputs)))
-
         if output == 0:
             game.move_right()
-        if output == 1:
+        elif output == 1:
             game.rotate_current_piece()
-        if output == 2:
+        elif output == 2:
             game.move_left()
         else:
             game.drop_piece()
+            # if num_rights > 1:
+            #     print num_rights
+            num_rights = 0
 
         keep_playing = game.keep_playing()
 
     score = game.get_score()
+    if score > max_score:
+        max_score = score
+        game.grid.print_grid()
     return score
 
 local_dir = os.path.dirname(__file__)
@@ -55,7 +63,7 @@ pop.run(eval_fitness, 1000)
 
 winner = pop.statistics.best_genome()
 winner_net = nn.create_feed_forward_phenotype(winner)
-print('\nBest genome:\n{!s}'.format(winner))
+print '\nBest genome:\n{!s}'.format(winner)
 
 
 
