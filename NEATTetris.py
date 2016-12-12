@@ -26,6 +26,7 @@ def play_game(net):
     Returns:
         int: Score earned
     """
+
     global max_score
     game = kivytetris.GameHandler()
 
@@ -53,7 +54,10 @@ def play_game(net):
     score = game.get_score()
     if score > max_score:
         max_score = score
+
         game.grid.print_grid()
+
+
     return score
 
 local_dir = os.path.dirname(__file__)
